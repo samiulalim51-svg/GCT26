@@ -22,14 +22,14 @@ body{font-family:Arial;text-align:center;}
 
 <!-- 2️⃣ Firebase initialization -->
 <script>
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCPdXradq3f4Wy8_Bnb8UleaPVN--abCyk",
-    authDomain: "gct26-33855.firebaseapp.com",
-    databaseURL: "https://gct26-33855-default-rtdb.firebaseio.com",
-    projectId: "gct26-33855",
-    storageBucket: "gct26-33855.firebasestorage.app",
-    messagingSenderId: "129594715864",
-    appId: "1:129594715864:web:611f4a662c66741da3f1ad"
+  authDomain: "gct26-33855.firebaseapp.com",
+  databaseURL: "https://gct26-33855-default-rtdb.firebaseio.com",
+  projectId: "gct26-33855",
+  storageBucket: "gct26-33855.firebasestorage.app",
+  messagingSenderId: "129594715864",
+  appId: "1:129594715864:web:611f4a662c66741da3f1ad"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -73,3 +73,4 @@ db.ref("match").on("value", function(snapshot){
 
 </body>
 </html>
+
