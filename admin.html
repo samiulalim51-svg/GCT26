@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Scoreboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;padding:15px;}
+input,select,button{padding:8px;margin:5px;width:100%;}
+</style>
+</head>
+<body>
+
+<h2>Match Setup</h2>
+
+<input id="team1" placeholder="Team 1 Name">
+<input id="team2" placeholder="Team 2 Name">
+
+<select id="batFirst">
+  <option value="">Who Bats First?</option>
+</select>
+
+<button onclick="startMatch()">Start Match</button>
+
+<hr>
+
+<h2>Score Update</h2>
+
+<button onclick="addRun(1)">+1 Run</button>
+<button onclick="addRun(4)">+4 Run</button>
+<button onclick="addRun(6)">+6 Run</button>
+<button onclick="addWicket()">Wicket</button>
+<button onclick="addBall()">Dot Ball</button>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCPdXradq3f4Wy8_Bnb8UleaPVN--abCyk",
+    authDomain: "gct26-33855.firebaseapp.com",
+    databaseURL: "https://gct26-33855-default-rtdb.firebaseio.com",
+    projectId: "gct26-33855",
+    storageBucket: "gct26-33855.firebasestorage.app",
+    messagingSenderId: "129594715864",
+    appId: "1:129594715864:web:611f4a662c66741da3f1ad"
+  };
+
+function startMatch(){
+  let t1=document.getElementById("team1").value;
+  let t2=document.getElementById("team2").value;
+  let bf=document.getElementById("batFirst").value;
+
+  db.ref("match").set({
+    team1:t1,
+    team2:t2,
+    battingFirst:bf,
+    innings:1,
+    maxOvers:10,
+    firstInnings:{runs:0,wickets:0,balls:0},
+    secondInnings:{runs:0,wickets:0,balls:0},
+    target:0,
+    winner:""
+  });
+}
+
+document.getElementById("team1").oninput =
+document.getElementById("team2").oninput = function(){
+  let t1=team1.value, t2=team2.value;
+  batFirst.innerHTML=`<option value="">Who Bats First?</option>
+  <option value="${t1}">${t1}</option>
+  <option value="${t2}">${t2}</option>`;
+}
+
+function addRun(r){
+  updateScore(r,false);
+}
+function addWicket(){
+  updateScore(0,true);
+}
+function addBall(){
+  updateScore(0,false);
+}
+
+function updateScore(run,isWicket){
+  db.ref("match").once("value",snap=>{
+    let m=snap.val();
+    let inn=m.innings==1?m.firstInnings:m.secondInnings;
+
+    inn.balls++;
+    inn.runs+=run;
+    if(isWicket) inn.wickets++;
+
+    let overEnd = inn.balls>=60 || inn.wickets>=10;
+
+    if(m.innings==1 && overEnd){
+      m.target=inn.runs+1;
+      m.innings=2;
+    }
+    else if(m.innings==2){
+      if(inn.runs>=m.target) m.winner=getBattingTeam(m)+" Wins";
+      else if(overEnd) m.winner=getBowlingTeam(m)+" Wins";
+    }
+
+    if(m.innings==1) m.firstInnings=inn;
+    else m.secondInnings=inn;
+
+    db.ref("match").set(m);
+  });
+}
+
+function getBattingTeam(m){
+  return m.innings==1?m.battingFirst:
+    (m.battingFirst==m.team1?m.team2:m.team1);
+}
+function getBowlingTeam(m){
+  return m.battingFirst==m.team1?m.team2:m.team1;
+}
+</script>
+
+</body>
+</html>

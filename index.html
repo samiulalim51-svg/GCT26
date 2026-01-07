@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Live Scoreboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;text-align:center;}
+h2{margin:5px;}
+</style>
+</head>
+<body>
+
+<h2 id="teams"></h2>
+<h3 id="innings"></h3>
+<h1 id="score"></h1>
+<h3 id="rr"></h3>
+<h3 id="reqrr"></h3>
+<h2 id="winner"></h2>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCPdXradq3f4Wy8_Bnb8UleaPVN--abCyk",
+    authDomain: "gct26-33855.firebaseapp.com",
+    databaseURL: "https://gct26-33855-default-rtdb.firebaseio.com",
+    projectId: "gct26-33855",
+    storageBucket: "gct26-33855.firebasestorage.app",
+    messagingSenderId: "129594715864",
+    appId: "1:129594715864:web:611f4a662c66741da3f1ad"
+  };
+
+db.ref("match").on("value",snap=>{
+  let m=snap.val();
+  if(!m) return;
+
+  document.getElementById("teams").innerText =
+    m.team1+" vs "+m.team2;
+
+  let inn=m.innings==1?m.firstInnings:m.secondInnings;
+  let overs=(inn.balls/6).toFixed(1);
+  let rr=((inn.runs*6)/inn.balls || 0).toFixed(2);
+
+  document.getElementById("innings").innerText =
+    "Innings "+m.innings;
+
+  document.getElementById("score").innerText =
+    inn.runs+"/"+inn.wickets+" ("+overs+" ov)";
+
+  document.getElementById("rr").innerText =
+    "Run Rate: "+rr;
+
+  if(m.innings==2){
+    let ballsLeft=60-inn.balls;
+    let runsLeft=m.target-inn.runs;
+    let rrr=((runsLeft*6)/ballsLeft || 0).toFixed(2);
+    document.getElementById("reqrr").innerText =
+      "Target: "+m.target+" | Required RR: "+rrr;
+  }
+
+  document.getElementById("winner").innerText = m.winner;
+});
+</script>
+
+</body>
+</html>
